@@ -10,9 +10,12 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 public class Main
 {
+
+    private static final Logger updateLog = Logger.getLogger(Main.class.getName());
 
     private static SyncProperties syncProperties;
     private static File cloudObelisk;
@@ -42,14 +45,15 @@ public class Main
             if(!new File(syncProperties.getCloudLocation()).exists())
             {
                 Install.uploadServer(syncProperties.getLocalLocation(), syncProperties.getCloudLocation());
-            }
-            else if(syncProperties.isDownloadServer())
-            {
+            } else {
                 cloudToLocalMapDirectoryMapping = Analysis.analyseDirectories(new File(syncProperties.getLocalLocation()),
                         new File(syncProperties.getCloudLocation()), false);
                 arkPlayerData = Analysis.obtainPlayerDataMapping(cloudToLocalMapDirectoryMapping,
                         syncProperties.getCloudLocation());
-                Download.downloadFromCloud(cloudToLocalMapDirectoryMapping, arkPlayerData, cloudObelisk, localObelisk);
+                if(syncProperties.isDownloadServer())
+                {
+                    Download.downloadFromCloud(cloudToLocalMapDirectoryMapping, arkPlayerData, cloudObelisk, localObelisk);
+                }
             }
             if(syncProperties.isSyncServer())
             {
@@ -72,18 +76,18 @@ public class Main
         {
             if(!file.getName().contains("ARK"))
             {
-                System.out.println(file.getName());
                 localGamePath += "\\" + file.getName();
                 break;
             }
         }
+        updateLog.info(localGamePath);
         return localGamePath;
     }
 
     private static String getCloudPath()
     {
         String cloudDirectoryPath = "C:\\Users\\" + System.getProperty("user.name") + "\\Dropbox\\ArkSync";
-        System.out.println(cloudDirectoryPath);
+        updateLog.info(cloudDirectoryPath);
         return cloudDirectoryPath;
     }
 

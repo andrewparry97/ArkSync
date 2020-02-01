@@ -8,9 +8,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Logger;
 
 public class Synchronisation
 {
+
+    private static final Logger updateLog = Logger.getLogger(Synchronisation.class.getName());
 
     public static void synchroniseDirectories(File directoryA, File directoryB, String filter)
     {
@@ -21,19 +24,35 @@ public class Synchronisation
         {
             for (File file : Objects.requireNonNull(directoryA.listFiles()))
             {
+                if(file.getName().contains("conflicted copy"))
+                {
+                    file = handleConflictedCopy(file);
+                }
                 locAFiles.put(file.getName(), file);
             }
             for (File file : Objects.requireNonNull(directoryB.listFiles()))
             {
+                if(file.getName().contains("conflicted copy"))
+                {
+                    file = handleConflictedCopy(file);
+                }
                 locBFiles.put(file.getName(), file);
             }
         } else {
             for (File file : Objects.requireNonNull(directoryA.listFiles((dir, name) -> name.toLowerCase().endsWith(filter))))
             {
+                if(file.getName().contains("conflicted copy"))
+                {
+                    file = handleConflictedCopy(file);
+                }
                 locAFiles.put(file.getName(), file);
             }
             for (File file : Objects.requireNonNull(directoryB.listFiles((dir, name) -> name.toLowerCase().endsWith(filter))))
             {
+                if(file.getName().contains("conflicted copy"))
+                {
+                    file = handleConflictedCopy(file);
+                }
                 locBFiles.put(file.getName(), file);
             }
         }
@@ -73,7 +92,7 @@ public class Synchronisation
 
     private static void handleMatchingFiles(File fileA, File fileB)
     {
-        System.out.println("Handling matching file: " + fileA.getName());
+        updateLog.info("Handling matching file: " + fileA.getName());
         if (fileA.lastModified() < fileB.lastModified())
         {
             try
@@ -81,13 +100,13 @@ public class Synchronisation
                 try
                 {
                     Files.copy(fileB.toPath(), fileA.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("File updated : " + fileA.getAbsolutePath());
+                    updateLog.info("File updated : " + fileA.getAbsolutePath());
                 }
                 catch (FileSystemException fse)
                 {
                     InputStream sourceStream = new FileInputStream(fileB);
                     Files.copy(sourceStream, fileA.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("File updated : " + fileA.getAbsolutePath());
+                    updateLog.info("File updated : " + fileA.getAbsolutePath());
                     sourceStream.close();
                     Files.copy(fileA.toPath(), fileB.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
@@ -95,7 +114,7 @@ public class Synchronisation
             catch (IOException ioe)
             {
                 ioe.printStackTrace();
-                System.out.println("Failed to update file!");
+                updateLog.info("Failed to update file!");
             }
         }
         else if (fileA.lastModified() > fileB.lastModified())
@@ -105,13 +124,13 @@ public class Synchronisation
                 try
                 {
                     Files.copy(fileA.toPath(), fileB.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("File updated : " + fileB.getAbsolutePath());
+                    updateLog.info("File updated : " + fileB.getAbsolutePath());
                 }
                 catch (FileSystemException fse)
                 {
                     InputStream sourceStream = new FileInputStream(fileA);
                     Files.copy(sourceStream, fileB.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("File updated : " + fileB.getAbsolutePath());
+                    updateLog.info("File updated : " + fileB.getAbsolutePath());
                     sourceStream.close();
                     Files.copy(fileB.toPath(), fileA.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
@@ -119,10 +138,10 @@ public class Synchronisation
             catch (IOException ioe)
             {
                 ioe.printStackTrace();
-                System.out.println("Failed to update file!");
+                updateLog.info("Failed to update file!");
             }
         } else {
-            System.out.println("Both files are up to date");
+            updateLog.info("Both files are up to date");
         }
     }
 
@@ -132,11 +151,11 @@ public class Synchronisation
         {
             if(file.delete())
             {
-                System.out.println("File removed: " + file.getName());
+                updateLog.info("File removed: " + file.getName());
             }
             else
             {
-                System.out.println("Failed to remove file " + file.getName());
+                updateLog.info("Failed to remove file " + file.getName());
             }
         } else {
             try
@@ -145,13 +164,13 @@ public class Synchronisation
                 try
                 {
                     Files.copy(file.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("File copied");
+                    updateLog.info("File copied");
                 }
                 catch (FileSystemException fse)
                 {
                     InputStream sourceStream = new FileInputStream(file);
                     Files.copy(sourceStream, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("File copied");
+                    updateLog.info("File copied");
                     sourceStream.close();
                     Files.copy(outputFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
@@ -159,9 +178,46 @@ public class Synchronisation
             catch (IOException ioe)
             {
                 ioe.printStackTrace();
-                System.out.println("Failed to copy file!");
+                updateLog.info("Failed to copy file!");
             }
         }
+    }
+
+    private static File handleConflictedCopy(File file)
+    {
+        updateLog.info("Resolving conflict!");
+        StringBuilder unwantedString = new StringBuilder();
+        boolean test = false;
+        for(char character : file.getAbsolutePath().toCharArray())
+        {
+            if(test)
+            {
+                if(character == '.')
+                {
+                    test = false;
+                } else {
+                    unwantedString.append(character);
+                }
+            }
+            else if(Character.isWhitespace(character))
+            {
+                test = true;
+            }
+        }
+        File replacement = new File(file.getAbsolutePath().replace(unwantedString.toString(), ""));
+        try {
+            Files.copy(file.toPath(), replacement.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }catch (IOException ioe){}
+        if(file.delete())
+        {
+            updateLog.info("File removed: " + file.getName());
+        }
+        else
+        {
+            updateLog.info("Failed to remove file " + file.getName());
+        }
+
+        return replacement;
     }
 
 }
