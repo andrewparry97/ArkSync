@@ -5,15 +5,16 @@ import arksync.runnables.RunnableSyncJob;
 import arksync.utilities.Analysis;
 import arksync.utilities.Download;
 import arksync.utilities.Install;
-import arksync.utilities.Synchronisation;
 
-import java.io.File;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Properties;
 
 public class Main
 {
 
+    private static SyncProperties syncProperties;
     private static File cloudObelisk;
     private static File localObelisk;
     private static ArkPlayerData arkPlayerData;
@@ -21,36 +22,45 @@ public class Main
 
     public static void main(String[] args)
     {
-        String localGamePath = "", cloudDirectoryPath = "";
-        if(args.length == 2)
-        {
-            cloudDirectoryPath = args[0];
-            localGamePath = args[1];
-        }
-        else if(args.length == 1)
-        {
-            cloudDirectoryPath = args[0];
-            localGamePath = getLocalPath();
-        }
-        else
-        {
-            cloudDirectoryPath = getCloudPath();
-            localGamePath = getLocalPath();
-        }
-        cloudObelisk = new File(cloudDirectoryPath + "\\obelisk");
-        localObelisk = new File(localGamePath + "\\LocalState\\Saved\\clusters\\solecluster");
+        try {
+            Properties properties = new Properties();
+            properties.load(new FileReader(new File(args[0])));
+            syncProperties = new SyncProperties(properties);
+            if(syncProperties.getCloudLocation().equals("null"))
+            {
+                syncProperties.setCloudLocation(getCloudPath());
+            }
+            if(syncProperties.getLocalLocation().equals("null"))
+            {
+                syncProperties.setLocalLocation(getLocalPath());
+            }
 
-        if(!new File(cloudDirectoryPath).exists())
-        {
-            Install.uploadServer(localGamePath, cloudDirectoryPath);
-        } else {
-            cloudToLocalMapDirectoryMapping = Analysis.analyseDirectories(new File(localGamePath), new File(cloudDirectoryPath), false);
-            arkPlayerData = Analysis.obtainPlayerDataMapping(cloudToLocalMapDirectoryMapping, cloudDirectoryPath);
-            Download.downloadFromCloud(cloudToLocalMapDirectoryMapping, arkPlayerData, cloudObelisk, localObelisk);
-        }
+            cloudObelisk = new File(syncProperties.getCloudLocation() + "\\obelisk");
+            localObelisk = new File(syncProperties.getLocalLocation()
+                    + "\\LocalState\\Saved\\clusters\\solecluster");
 
-        Thread scheduledUpdate = new Thread(new RunnableSyncJob());
-        scheduledUpdate.start();
+            if(!new File(syncProperties.getCloudLocation()).exists())
+            {
+                Install.uploadServer(syncProperties.getLocalLocation(), syncProperties.getCloudLocation());
+            }
+            else if(syncProperties.isDownloadServer())
+            {
+                cloudToLocalMapDirectoryMapping = Analysis.analyseDirectories(new File(syncProperties.getLocalLocation()),
+                        new File(syncProperties.getCloudLocation()), false);
+                arkPlayerData = Analysis.obtainPlayerDataMapping(cloudToLocalMapDirectoryMapping,
+                        syncProperties.getCloudLocation());
+                Download.downloadFromCloud(cloudToLocalMapDirectoryMapping, arkPlayerData, cloudObelisk, localObelisk);
+            }
+            if(syncProperties.isSyncServer())
+            {
+                Thread scheduledUpdate = new Thread(new RunnableSyncJob());
+                scheduledUpdate.start();
+            }
+
+        } catch (IOException ioe)
+        {
+            ioe.printStackTrace();
+        }
     }
 
     private static String getLocalPath()
@@ -105,6 +115,11 @@ public class Main
     public static void setCloudToLocalMapDirectoryMapping(HashMap<File, File> cloudToLocalMapDirectoryMapping)
     {
         Main.cloudToLocalMapDirectoryMapping = cloudToLocalMapDirectoryMapping;
+    }
+
+    public static SyncProperties getSyncProperties()
+    {
+        return syncProperties;
     }
 
 }
