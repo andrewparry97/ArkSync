@@ -66,7 +66,7 @@ public class Synchronisation
             }
             else if (locBFiles.containsKey(file.getName()))
             {
-                handleMissingFile(directoryA, directoryB, fileB);
+                handleMissingFile(directoryB, directoryA, fileB);
             }
         }
     }
@@ -80,22 +80,16 @@ public class Synchronisation
             {
                 try
                 {
-                    if(fileB.canWrite() && fileA.canWrite())
-                    {
-                        Files.copy(fileB.toPath(), fileA.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        System.out.println("File updated : " + fileA.getAbsolutePath());
-                    }
+                    Files.copy(fileB.toPath(), fileA.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("File updated : " + fileA.getAbsolutePath());
                 }
                 catch (FileSystemException fse)
                 {
-                    if(fileB.canWrite() && fileA.canWrite())
-                    {
-                        InputStream sourceStream = new FileInputStream(fileB);
-                        Files.copy(sourceStream, fileA.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        System.out.println("File updated : " + fileA.getAbsolutePath());
-                        sourceStream.close();
-                        Files.copy(fileA.toPath(), fileB.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    }
+                    InputStream sourceStream = new FileInputStream(fileB);
+                    Files.copy(sourceStream, fileA.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("File updated : " + fileA.getAbsolutePath());
+                    sourceStream.close();
+                    Files.copy(fileA.toPath(), fileB.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
             }
             catch (IOException ioe)
@@ -110,22 +104,16 @@ public class Synchronisation
             {
                 try
                 {
-                    if(fileB.canWrite() && fileA.canWrite())
-                    {
-                        Files.copy(fileA.toPath(), fileB.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        System.out.println("File updated : " + fileB.getAbsolutePath());
-                    }
+                    Files.copy(fileA.toPath(), fileB.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("File updated : " + fileB.getAbsolutePath());
                 }
                 catch (FileSystemException fse)
                 {
-                    if(fileB.canWrite() && fileA.canWrite())
-                    {
-                        InputStream sourceStream = new FileInputStream(fileA);
-                        Files.copy(sourceStream, fileB.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        System.out.println("File updated : " + fileB.getAbsolutePath());
-                        sourceStream.close();
-                        Files.copy(fileB.toPath(), fileA.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    }
+                    InputStream sourceStream = new FileInputStream(fileA);
+                    Files.copy(sourceStream, fileB.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("File updated : " + fileB.getAbsolutePath());
+                    sourceStream.close();
+                    Files.copy(fileB.toPath(), fileA.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
             }
             catch (IOException ioe)
@@ -150,30 +138,22 @@ public class Synchronisation
             {
                 System.out.println("Failed to remove file " + file.getName());
             }
-        }
-        else
-        {
+        } else {
             try
             {
                 File outputFile = new File(toDirectory.getAbsolutePath() + "\\" + file.getName());
                 try
                 {
-                    if(file.canWrite() && outputFile.canWrite())
-                    {
-                        Files.copy(file.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        System.out.println("File copied");
-                    }
+                    Files.copy(file.toPath(), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("File copied");
                 }
                 catch (FileSystemException fse)
                 {
-                    if(file.canWrite() && outputFile.canWrite())
-                    {
-                        InputStream sourceStream = new FileInputStream(file);
-                        Files.copy(sourceStream, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        System.out.println("File copied");
-                        sourceStream.close();
-                        Files.copy(outputFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    }
+                    InputStream sourceStream = new FileInputStream(file);
+                    Files.copy(sourceStream, outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    System.out.println("File copied");
+                    sourceStream.close();
+                    Files.copy(outputFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
             }
             catch (IOException ioe)
