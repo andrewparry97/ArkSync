@@ -202,6 +202,7 @@ public class Synchronisation
             else if(Character.isWhitespace(character))
             {
                 test = true;
+                unwantedString.append(character);
             }
         }
         File replacement = new File(file.getAbsolutePath().replace(unwantedString.toString(), ""));
