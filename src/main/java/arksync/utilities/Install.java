@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
@@ -54,18 +53,13 @@ public class Install
 
             try
             {
-                try
+                Date date = new Date(localMapFile.lastModified());
+                InputStream sourceStream = new FileInputStream(localMapFile);
+                Files.copy(sourceStream, cloudMapFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                sourceStream.close();
+                if(localMapFile.setLastModified(date.getTime()) && cloudMapFile.setLastModified(date.getTime()))
                 {
-                    Files.copy(localMapFile.toPath(), cloudMapFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     System.out.println("Uploaded map file: " + localMapFile.getName());
-                }
-                catch (FileSystemException fse)
-                {
-                    InputStream sourceStream = new FileInputStream(localMapFile);
-                    Files.copy(sourceStream, cloudMapFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    System.out.println("Uploaded map file: " + localMapFile.getName());
-                    sourceStream.close();
-                    Files.copy(cloudMapFile.toPath(), localMapFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
             }
             catch (IOException ioe)
@@ -100,22 +94,17 @@ public class Install
         for(File file : Objects.requireNonNull(fromDirectoryFiles))
         {
             File toFile = new File(toDirectory.getAbsolutePath() + "\\" + file.getName());
-            if(!toFile.exists())
+            if(!toFile.exists() || file.lastModified() > toFile.lastModified())
             {
                 try
                 {
-                    try
+                    Date date = new Date(file.lastModified());
+                    InputStream sourceStream = new FileInputStream(file);
+                    Files.copy(sourceStream, toFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    sourceStream.close();
+                    if(toFile.setLastModified(date.getTime()) && file.setLastModified(date.getTime()))
                     {
-                        Files.copy(file.toPath(), toFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                         System.out.println("Uploaded file: " + file.getName());
-                    }
-                    catch (FileSystemException fse)
-                    {
-                        InputStream sourceStream = new FileInputStream(file);
-                        Files.copy(sourceStream, toFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        System.out.println("Uploaded file: " + file.getName());
-                        sourceStream.close();
-                        Files.copy(toFile.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     }
                 }
                 catch (IOException missingDirectories)
