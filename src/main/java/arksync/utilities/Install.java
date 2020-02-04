@@ -3,7 +3,6 @@ package arksync.utilities;
 
 import arksync.Main;
 import arksync.dto.ArkPlayerData;
-import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,14 +30,27 @@ public class Install
 
     private static void uploadEmptyServerDirectory(String cloudDirectoryPath)
     {
-        String arkSyncDirectoryPath = "C:\\Program Files\\ArkSync\\ArkSync";
-        try
+        File serverDirectory = new File(cloudDirectoryPath);
+        File obeliskDirectory = new File(cloudDirectoryPath + "\\obelisk");
+        File mapsDirectory = new File(cloudDirectoryPath + "\\maps");
+        File playerDataDirectory = new File(cloudDirectoryPath + "\\player_data");
+        if(serverDirectory.mkdir() && obeliskDirectory.mkdir() && mapsDirectory.mkdir() && playerDataDirectory.mkdir())
         {
-            FileUtils.copyDirectory(new File(arkSyncDirectoryPath), new File(cloudDirectoryPath));
+            System.out.println("New server directory created");
+        } else {
+            System.out.println("Failed to create new server directory!");
         }
-        catch (IOException ioe)
+        File arkProfileDirectory = new File(playerDataDirectory.getAbsolutePath() + "\\arkprofile");
+        File arkTribeDirectory = new File(playerDataDirectory.getAbsolutePath() + "\\arktribe");
+        File arkTributeTribeDirectory = new File(playerDataDirectory.getAbsolutePath() + "\\arktributetribe");
+        File arkProfileBakDirectory = new File(playerDataDirectory.getAbsolutePath() + "\\profilebak");
+        File arkTribeBakDirectory = new File(playerDataDirectory.getAbsolutePath() + "\\tribebak");
+        if(arkProfileDirectory.mkdir() && arkTribeDirectory.mkdir() && arkTributeTribeDirectory.mkdir() &&
+                arkProfileBakDirectory.mkdir() && arkTribeBakDirectory.mkdir())
         {
-            ioe.printStackTrace();
+            System.out.println("player_data directory created");
+        } else {
+            System.out.println("Failed to create player_data directory!");
         }
     }
 
