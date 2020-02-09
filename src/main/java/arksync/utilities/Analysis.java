@@ -91,7 +91,7 @@ public class Analysis
                         try
                         {
                             FileUtils.copyFile(localMapFile, cloudMapFile);
-                            System.out.println("Uploaded map file " + localMapFile.getName());
+                            System.out.println("Uploaded map file: " + localMapFile.getName());
                         }
                         catch (IOException ioe)
                         {

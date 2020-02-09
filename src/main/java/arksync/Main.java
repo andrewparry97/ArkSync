@@ -1,6 +1,7 @@
 package arksync;
 
 import arksync.dto.ArkPlayerData;
+import arksync.runnables.RunnableBackupJob;
 import arksync.runnables.RunnableSyncJob;
 import arksync.utilities.Analysis;
 import arksync.utilities.Download;
@@ -37,6 +38,10 @@ public class Main
             {
                 syncProperties.setLocalLocation(getLocalPath());
             }
+            if(syncProperties.getBackupLocation().equals("null"))
+            {
+                syncProperties.setBackupLocation("C:\\Users\\"+ System.getProperty("user.name") +"\\ArkSyncBackups");
+            }
 
             cloudObelisk = new File(syncProperties.getCloudLocation() + "\\obelisk");
             localObelisk = new File(syncProperties.getLocalLocation()
@@ -59,6 +64,11 @@ public class Main
             {
                 Thread scheduledUpdate = new Thread(new RunnableSyncJob());
                 scheduledUpdate.start();
+            }
+            if(syncProperties.isBackupDaily() || syncProperties.isBackupHourly())
+            {
+                Thread scheduledBackup = new Thread(new RunnableBackupJob());
+                scheduledBackup.start();
             }
 
         } catch (IOException ioe)

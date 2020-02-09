@@ -36,9 +36,9 @@ public class Install
         File playerDataDirectory = new File(cloudDirectoryPath + "\\player_data");
         if(serverDirectory.mkdir() && obeliskDirectory.mkdir() && mapsDirectory.mkdir() && playerDataDirectory.mkdir())
         {
-            System.out.println("New server directory created");
+            System.out.println("New directory created");
         } else {
-            System.out.println("Failed to create new server directory!");
+            System.out.println("Failed to create new directory!");
         }
         File arkProfileDirectory = new File(playerDataDirectory.getAbsolutePath() + "\\arkprofile");
         File arkTribeDirectory = new File(playerDataDirectory.getAbsolutePath() + "\\arktribe");
@@ -71,13 +71,13 @@ public class Install
                 sourceStream.close();
                 if(localMapFile.setLastModified(date.getTime()) && cloudMapFile.setLastModified(date.getTime()))
                 {
-                    System.out.println("Uploaded map file: " + localMapFile.getName());
+                    System.out.println("Copied map file: " + localMapFile.getName());
                 }
             }
             catch (IOException ioe)
             {
                 ioe.printStackTrace();
-                System.out.println("Failed to upload map file: " + localMapFile.getName());
+                System.out.println("Failed to copy map file: " + localMapFile.getName());
             }
         }
     }
@@ -116,12 +116,12 @@ public class Install
                     sourceStream.close();
                     if(toFile.setLastModified(date.getTime()) && file.setLastModified(date.getTime()))
                     {
-                        System.out.println("Uploaded file: " + file.getName());
+                        System.out.println("Copied file: " + file.getName());
                     }
                 }
                 catch (IOException missingDirectories)
                 {
-                    System.out.println("Failed to upload file: " + file.getName());
+                    System.out.println("Failed to copy file: " + file.getName());
                 }
             }
         }

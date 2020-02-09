@@ -20,28 +20,28 @@ public class RunnableSyncJob implements Runnable
             {
                 JobDetail syncObelisk = JobBuilder.newJob(ObeliskUpdate.class)
                         .withIdentity("syncObelisk", "group1").build();
-                Trigger trigger1 = TriggerBuilder.newTrigger().withIdentity("simpleTrigger", "group1")
+                Trigger trigger = TriggerBuilder.newTrigger().withIdentity("simpleTrigger", "group1")
                         .withSchedule(CronScheduleBuilder.cronSchedule("0 0/" + Main.getSyncProperties().getObeliskPeriod()
                                 + " * * * ?")).build();
-                scheduler.scheduleJob(syncObelisk, trigger1);
+                scheduler.scheduleJob(syncObelisk, trigger);
             }
             if(Main.getSyncProperties().isMapsSync())
             {
                 JobDetail syncMap = JobBuilder.newJob(MapUpdate.class)
                         .withIdentity("syncMap", "group2").build();
-                Trigger trigger2 = TriggerBuilder.newTrigger().withIdentity("simpleTrigger", "group2")
+                Trigger trigger = TriggerBuilder.newTrigger().withIdentity("simpleTrigger", "group2")
                         .withSchedule(CronScheduleBuilder.cronSchedule("0 0/" + Main.getSyncProperties().getMapsPeriod()
                                 + " * * * ?")).build();
-                scheduler.scheduleJob(syncMap, trigger2);
+                scheduler.scheduleJob(syncMap, trigger);
             }
             if(Main.getSyncProperties().isPlayerSync())
             {
                 JobDetail syncPlayerData = JobBuilder.newJob(PlayerDataUpdate.class)
                         .withIdentity("syncPlayerData", "group3").build();
-                Trigger trigger3 = TriggerBuilder.newTrigger().withIdentity("simpleTrigger", "group3")
+                Trigger trigger = TriggerBuilder.newTrigger().withIdentity("simpleTrigger", "group3")
                         .withSchedule(CronScheduleBuilder.cronSchedule("0 0/" + Main.getSyncProperties().getPlayerPeriod()
                                 + " * * * ?")).build();
-                scheduler.scheduleJob(syncPlayerData, trigger3);
+                scheduler.scheduleJob(syncPlayerData, trigger);
             }
         }
         catch (Exception e)
