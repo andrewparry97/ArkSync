@@ -25,7 +25,7 @@ public class Install
 
         uploadMaps(cloudToLocalMapDirectoryMapping);
         uploadPlayerData(cloudToLocalMapDirectoryMapping, arkPlayerData);
-        uploadFiles(Main.getLocalObelisk(), Main.getCloudObelisk(), null);
+        uploadFiles(Main.getLocalObelisk(), new File(cloudDirectoryPath + "\\obelisk"), null);
     }
 
     private static void uploadEmptyServerDirectory(String cloudDirectoryPath)
