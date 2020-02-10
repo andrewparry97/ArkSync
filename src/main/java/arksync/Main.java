@@ -1,7 +1,6 @@
 package arksync;
 
 import arksync.dto.ArkPlayerData;
-import arksync.runnables.RunnableBackupJob;
 import arksync.runnables.RunnableSyncJob;
 import arksync.utilities.Analysis;
 import arksync.utilities.Download;
@@ -60,17 +59,11 @@ public class Main
                     Download.downloadFromCloud(cloudToLocalMapDirectoryMapping, arkPlayerData, cloudObelisk, localObelisk);
                 }
             }
-            if(syncProperties.isSyncServer())
+            if(syncProperties.isSyncServer() || syncProperties.isBackupDaily() || syncProperties.isBackupHourly())
             {
                 Thread scheduledUpdate = new Thread(new RunnableSyncJob());
                 scheduledUpdate.start();
             }
-            if(syncProperties.isBackupDaily() || syncProperties.isBackupHourly())
-            {
-                Thread scheduledBackup = new Thread(new RunnableBackupJob());
-                scheduledBackup.start();
-            }
-
         } catch (IOException ioe)
         {
             ioe.printStackTrace();
