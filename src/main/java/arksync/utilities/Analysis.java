@@ -15,7 +15,7 @@ public class Analysis
 
     public static HashMap<File, File> analyseDirectories(File localGameDirectory, File cloudDirectory, boolean install)
     {
-        File localSaveDirectory = new File(localGameDirectory.getAbsolutePath() + "\\LocalState\\Saved");
+        File localSaveDirectory = new File(localGameDirectory.getAbsolutePath() + "\\ShooterGame\\Saved");
         List<File> localMapDirectories = new ArrayList<>(getLocalMapDirectories(localSaveDirectory));
         List<File> cloudMapDirectories = new ArrayList<>(getCloudMapDirectories(cloudDirectory));
 
@@ -24,16 +24,13 @@ public class Analysis
 
     private static List<File> getLocalMapDirectories(File localSaveDirectory)
     {
-        File localSavedMapsDirectory = new File(localSaveDirectory.getAbsolutePath() + "\\Maps");
+        File localSavedMapsDirectory = new File(localSaveDirectory.getAbsolutePath() + "\\SavedArks");
         List<File> mapDirectories = new ArrayList<>();
+        System.out.println(localSavedMapsDirectory.getAbsolutePath());
         for(File mapDirectory : Objects.requireNonNull(localSavedMapsDirectory.listFiles()))
         {
-            while(!mapDirectory.getName().contains("SavedArks"))
-            {
-                mapDirectory = Objects.requireNonNull(mapDirectory.listFiles())[0];
-            }
             File mapFile = new ArrayList<>(Arrays.asList(Objects.requireNonNull(
-                    mapDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".ark"))))).get(0);
+                    mapDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".ark"))))).getFirst();
             mapDirectories.add(mapDirectory);
             mapNames.add(FilenameUtils.getBaseName(mapFile.getName()));
         }
@@ -73,13 +70,13 @@ public class Analysis
                         cloudDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".ark")))));
                  if(!cloudMapFiles.isEmpty())
                  {
-                     cloudMapFile = cloudMapFiles.get(0);
+                     cloudMapFile = cloudMapFiles.getFirst();
                  }
             }
             for(File localDirectory : localMapDirectories)
             {
                 File localMapFile = new ArrayList<>(Arrays.asList(Objects.requireNonNull(
-                        localDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".ark"))))).get(0);
+                        localDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".ark"))))).getFirst();
 
                 if(!install && cloudDirectory.getName().equals(FilenameUtils.getBaseName(localMapFile.getName())))
                 {

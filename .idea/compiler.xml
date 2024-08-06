@@ -6,12 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="sync" />
         <module name="arksync" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="arksync" target="8" />
       <module name="company" target="8" />
       <module name="sync" target="8" />
     </bytecodeTargetLevel>

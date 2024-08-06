@@ -25,16 +25,16 @@ public class Install
 
         uploadMaps(cloudToLocalMapDirectoryMapping);
         uploadPlayerData(cloudToLocalMapDirectoryMapping, arkPlayerData);
-        uploadFiles(Main.getLocalObelisk(), new File(cloudDirectoryPath + "\\obelisk"), null);
+        //uploadFiles(Main.getLocalObelisk(), new File(cloudDirectoryPath + "\\obelisk"), null);
     }
 
     private static void uploadEmptyServerDirectory(String cloudDirectoryPath)
     {
         File serverDirectory = new File(cloudDirectoryPath);
-        File obeliskDirectory = new File(cloudDirectoryPath + "\\obelisk");
+        //File obeliskDirectory = new File(cloudDirectoryPath + "\\obelisk");
         File mapsDirectory = new File(cloudDirectoryPath + "\\maps");
         File playerDataDirectory = new File(cloudDirectoryPath + "\\player_data");
-        if(serverDirectory.mkdir() && obeliskDirectory.mkdir() && mapsDirectory.mkdir() && playerDataDirectory.mkdir())
+        if(serverDirectory.mkdir() /*&& obeliskDirectory.mkdir()*/ && mapsDirectory.mkdir() && playerDataDirectory.mkdir())
         {
             System.out.println("New directory created");
         } else {

@@ -16,7 +16,7 @@ public class RunnableSyncJob implements Runnable
             scheduler.start();
             if(Main.getSyncProperties().isSyncServer())
             {
-                if (Main.getSyncProperties().isObeliskSync())
+                /*if (Main.getSyncProperties().isObeliskSync())
                 {
                     JobDetail syncObelisk = JobBuilder.newJob(ObeliskUpdate.class)
                             .withIdentity("syncObelisk", "group1").build();
@@ -24,7 +24,7 @@ public class RunnableSyncJob implements Runnable
                             .withSchedule(CronScheduleBuilder.cronSchedule("0 0/" + Main.getSyncProperties().getObeliskPeriod()
                                     + " * * * ?")).build();
                     scheduler.scheduleJob(syncObelisk, trigger);
-                }
+                }*/
                 if (Main.getSyncProperties().isMapsSync())
                 {
                     JobDetail syncMap = JobBuilder.newJob(MapUpdate.class)
@@ -44,7 +44,8 @@ public class RunnableSyncJob implements Runnable
                     scheduler.scheduleJob(syncPlayerData, trigger);
                 }
             }
-            if(Main.getSyncProperties().isBackupHourly() || Main.getSyncProperties().isBackupDaily())
+            if(Main.getSyncProperties().isBackupHourly() || Main.getSyncProperties().isBackupDaily()
+                    || Main.getSyncProperties().isBackupWeekly() || Main.getSyncProperties().isBackupMonthly())
             {
                 if (Main.getSyncProperties().isBackupHourly())
                 {
@@ -61,6 +62,22 @@ public class RunnableSyncJob implements Runnable
                     Trigger trigger = TriggerBuilder.newTrigger().withIdentity("simpleTrigger", "group5")
                             .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 * * ?")).build();
                     scheduler.scheduleJob(backupDaily, trigger);
+                }
+                if (Main.getSyncProperties().isBackupWeekly())
+                {
+                    JobDetail backupWeekly = JobBuilder.newJob(WeeklyBackup.class)
+                            .withIdentity("backupWeekly", "group6").build();
+                    Trigger trigger = TriggerBuilder.newTrigger().withIdentity("simpleTrigger", "group6")
+                            .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 ? * 1")).build();
+                    scheduler.scheduleJob(backupWeekly, trigger);
+                }
+                if (Main.getSyncProperties().isBackupMonthly())
+                {
+                    JobDetail backupMonthly = JobBuilder.newJob(MonthlyBackup.class)
+                            .withIdentity("backupMonthly", "group7").build();
+                    Trigger trigger = TriggerBuilder.newTrigger().withIdentity("simpleTrigger", "group7")
+                            .withSchedule(CronScheduleBuilder.cronSchedule("0 0 0 1 * ?")).build();
+                    scheduler.scheduleJob(backupMonthly, trigger);
                 }
             }
         }

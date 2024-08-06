@@ -18,9 +18,13 @@ public class SyncProperties
     private boolean syncServer;
     private boolean backupHourly;
     private boolean backupDaily;
+    private boolean backupWeekly;
+    private boolean backupMonthly;
     private boolean wipeBackups;
     private int wipeHour;
     private int wipeDay;
+    private int wipeWeek;
+    private int wipeMonth;
 
     public SyncProperties(Properties properties)
     {
@@ -37,9 +41,13 @@ public class SyncProperties
         syncServer = Boolean.valueOf(properties.getProperty("task.sync"));
         backupHourly = Boolean.valueOf(properties.getProperty("backup.hourly"));
         backupDaily = Boolean.valueOf(properties.getProperty("backup.daily"));
+        backupWeekly = Boolean.valueOf(properties.getProperty("backup.weekly"));
+        backupMonthly = Boolean.valueOf(properties.getProperty("backup.monthly"));
         wipeBackups = Boolean.valueOf(properties.getProperty("backup.wipe"));
         wipeHour = Integer.valueOf(properties.getProperty("wipe.hour"));
         wipeDay = Integer.valueOf(properties.getProperty("wipe.day"));
+        wipeWeek = Integer.valueOf(properties.getProperty("wipe.week"));
+        wipeMonth = Integer.valueOf(properties.getProperty("wipe.month"));
     }
 
     public boolean isMapsSync()
@@ -112,6 +120,16 @@ public class SyncProperties
         return backupHourly;
     }
 
+    public boolean isBackupWeekly()
+    {
+        return backupWeekly;
+    }
+
+    public boolean isBackupMonthly()
+    {
+        return backupMonthly;
+    }
+
     public boolean isWipeBackups()
     {
         return wipeBackups;
@@ -125,6 +143,16 @@ public class SyncProperties
     public int getWipeHour()
     {
         return wipeHour;
+    }
+
+    public int getWipeWeek()
+    {
+        return wipeWeek;
+    }
+
+    public int getWipeMonth()
+    {
+        return wipeMonth;
     }
 
     public String getBackupLocation()
